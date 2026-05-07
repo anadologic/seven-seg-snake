@@ -27,14 +27,17 @@ end entity seg_decoder;
 architecture rtl of seg_decoder is
 begin
 
-    ----------------------------------------------------------------------------
-    -- TODO Step 1: Combinational decode
-    --   Use a `with pos select` or a `case` inside a process(pos) to map
-    --   each position 0..5 to the patterns listed in the header.
-    --   Provide a safe default (all '1', display blank) for any out-of-range
-    --   value (defensive coding).
-    ----------------------------------------------------------------------------
-
-    seg_n <= (others => '1');  -- safe default: all segments off
+    decode_proc : process (pos)
+    begin
+        case pos is
+            when 0      => seg_n <= "0111111";  -- a
+            when 1      => seg_n <= "1011111";  -- b
+            when 2      => seg_n <= "1101111";  -- c
+            when 3      => seg_n <= "1110111";  -- d
+            when 4      => seg_n <= "1111011";  -- e
+            when 5      => seg_n <= "1111101";  -- f
+            when others => seg_n <= (others => '1');  -- safe blank
+        end case;
+    end process;
 
 end architecture rtl;

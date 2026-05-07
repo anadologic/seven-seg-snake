@@ -12,6 +12,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
+use IEEE.MATH_REAL.ALL;
 
 entity tick_gen is
     generic (
@@ -26,30 +27,30 @@ end entity tick_gen;
 
 architecture rtl of tick_gen is
 
-    ----------------------------------------------------------------------------
-    -- TODO Step 1: Counter wide enough to count up to DIVIDER-1.
-    --   signal cnt : unsigned(... downto 0);
-    --   Hint: width = integer(ceil(log2(real(DIVIDER))))
-    ----------------------------------------------------------------------------
+    constant CNT_W : positive := positive(integer(ceil(log2(real(DIVIDER)))));
+    signal cnt    : unsigned(CNT_W-1 downto 0) := (others => '0');
+    signal tick_r : std_logic := '0';
 
 begin
 
-    ----------------------------------------------------------------------------
-    -- TODO Step 2: Counter process
-    --   On rst:                cnt <= 0; tick <= '0';
-    --   On rising_edge(clk):
-    --     if cnt = DIVIDER-1 then
-    --       cnt  <= 0;
-    --       tick <= '1';
-    --     else
-    --       cnt  <= cnt + 1;
-    --       tick <= '0';
-    --     end if;
-    --
-    --   Note: drive `tick` from a register (not combinationally) to keep
-    --   it glitch-free and exactly one clock wide.
-    ----------------------------------------------------------------------------
+    div_proc : process (clk)
+    begin
+        if rising_edge(clk) then
+            if rst = '1' then
+                cnt    <= (others => '0');
+                tick_r <= '0';
+            else
+                if cnt = to_unsigned(DIVIDER-1, CNT_W) then
+                    cnt    <= (others => '0');
+                    tick_r <= '1';
+                else
+                    cnt    <= cnt + 1;
+                    tick_r <= '0';
+                end if;
+            end if;
+        end if;
+    end process;
 
-    tick <= '0';  -- safe default until implemented
+    tick <= tick_r;
 
 end architecture rtl;

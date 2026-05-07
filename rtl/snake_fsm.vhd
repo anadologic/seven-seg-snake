@@ -8,7 +8,6 @@
 -- Generics:
 --   NUM_POSITIONS : size of the loop the snake walks around.
 --                   For a single-digit demo: 6 (segments a,b,c,d,e,f).
---                   For an 8-digit perimeter loop: see top module.
 --
 -- Convention:
 --   dir = '0' -> increment (forward)
@@ -34,32 +33,33 @@ end entity snake_fsm;
 
 architecture rtl of snake_fsm is
 
-    ----------------------------------------------------------------------------
-    -- TODO Step 1: Position register
-    --   signal pos_r : integer range 0 to NUM_POSITIONS-1;
-    ----------------------------------------------------------------------------
+    signal pos_r : integer range 0 to NUM_POSITIONS-1 := 0;
 
 begin
 
-    ----------------------------------------------------------------------------
-    -- TODO Step 2: Sequential update
-    --   On rst:                pos_r <= 0;
-    --   On rising_edge(clk):
-    --     if step = '1' then
-    --       if dir = '0' then
-    --         if pos_r = NUM_POSITIONS-1 then pos_r <= 0;
-    --         else                            pos_r <= pos_r + 1;
-    --         end if;
-    --       else
-    --         if pos_r = 0 then pos_r <= NUM_POSITIONS-1;
-    --         else              pos_r <= pos_r - 1;
-    --         end if;
-    --       end if;
-    --     end if;
-    ----------------------------------------------------------------------------
+    fsm_proc : process (clk)
+    begin
+        if rising_edge(clk) then
+            if rst = '1' then
+                pos_r <= 0;
+            elsif step = '1' then
+                if dir = '0' then
+                    if pos_r = NUM_POSITIONS-1 then
+                        pos_r <= 0;
+                    else
+                        pos_r <= pos_r + 1;
+                    end if;
+                else
+                    if pos_r = 0 then
+                        pos_r <= NUM_POSITIONS-1;
+                    else
+                        pos_r <= pos_r - 1;
+                    end if;
+                end if;
+            end if;
+        end if;
+    end process;
 
-    -- TODO: pos <= pos_r;
-
-    pos <= 0;  -- safe default until implemented
+    pos <= pos_r;
 
 end architecture rtl;

@@ -14,6 +14,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
+use IEEE.MATH_REAL.ALL;
 
 entity debouncer is
     generic (
@@ -29,46 +30,58 @@ end entity debouncer;
 
 architecture rtl of debouncer is
 
-    ----------------------------------------------------------------------------
-    -- TODO Step 1: 2-FF synchronizer for async_in
-    --   signal sync_ff1, sync_ff2 : std_logic;
-    ----------------------------------------------------------------------------
+    -- 2-FF synchronizer
+    signal sync_ff1 : std_logic := '0';
+    signal sync_ff2 : std_logic := '0';
 
+    attribute ASYNC_REG             : string;
+    attribute ASYNC_REG of sync_ff1 : signal is "TRUE";
+    attribute ASYNC_REG of sync_ff2 : signal is "TRUE";
 
-    ----------------------------------------------------------------------------
-    -- TODO Step 2: Stability counter
-    --   signal cnt        : unsigned( ... );  -- wide enough for DEBOUNCE_CYCLES
-    --   signal stable_val : std_logic;        -- last accepted value
-    ----------------------------------------------------------------------------
+    -- Stability counter wide enough for DEBOUNCE_CYCLES-1
+    constant CNT_W : positive := positive(integer(ceil(log2(real(DEBOUNCE_CYCLES)))));
+    signal cnt        : unsigned(CNT_W-1 downto 0) := (others => '0');
+    signal stable_val : std_logic := '0';
 
 begin
 
-    ----------------------------------------------------------------------------
-    -- TODO Step 3: Synchronizer process
-    --   On every rising_edge(clk):
-    --     sync_ff1 <= async_in;
-    --     sync_ff2 <= sync_ff1;
-    --   On rst, both FFs <= '0'.
-    ----------------------------------------------------------------------------
+    -- 2-FF synchronizer
+    sync_proc : process (clk)
+    begin
+        if rising_edge(clk) then
+            if rst = '1' then
+                sync_ff1 <= '0';
+                sync_ff2 <= '0';
+            else
+                sync_ff1 <= async_in;
+                sync_ff2 <= sync_ff1;
+            end if;
+        end if;
+    end process;
 
+    -- Stability counter: only adopt sync_ff2 once it has held for
+    -- DEBOUNCE_CYCLES consecutive clocks.
+    debounce_proc : process (clk)
+    begin
+        if rising_edge(clk) then
+            if rst = '1' then
+                cnt        <= (others => '0');
+                stable_val <= '0';
+            else
+                if sync_ff2 /= stable_val then
+                    if cnt = to_unsigned(DEBOUNCE_CYCLES-1, CNT_W) then
+                        stable_val <= sync_ff2;
+                        cnt        <= (others => '0');
+                    else
+                        cnt <= cnt + 1;
+                    end if;
+                else
+                    cnt <= (others => '0');
+                end if;
+            end if;
+        end if;
+    end process;
 
-    ----------------------------------------------------------------------------
-    -- TODO Step 4: Debounce process
-    --   On rst:                cnt <= 0; stable_val <= '0'; (or current input)
-    --   On rising_edge(clk):
-    --     if sync_ff2 /= stable_val then
-    --       cnt <= cnt + 1;
-    --       if cnt = DEBOUNCE_CYCLES-1 then
-    --         stable_val <= sync_ff2;
-    --         cnt        <= 0;
-    --       end if;
-    --     else
-    --       cnt <= 0;
-    --     end if;
-    ----------------------------------------------------------------------------
-
-    -- TODO: clean <= stable_val;
-
-    clean <= '0';  -- safe default until implemented
+    clean <= stable_val;
 
 end architecture rtl;

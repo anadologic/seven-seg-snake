@@ -64,12 +64,10 @@ architecture rtl of seven_seg_snake is
     signal pos        : integer range 0 to NUM_POS-1;
     signal seg_active : std_logic_vector(6 downto 0);
 
-    ----------------------------------------------------------------------------
-    -- TODO Step A: Per-digit pattern array for the multiplexer.
-    --   For the simple "snake on digit 0" version, only index 0 carries the
-    --   live pattern; all others are blank ("1111111").
-    --   Later, fill more slots to extend the snake across multiple digits.
-    ----------------------------------------------------------------------------
+    -- Per-digit cathode patterns fed to the multiplexer.
+    -- Simple version: snake lives on digit 0; other digits stay blank.
+    -- (Extension idea: drive multiple slots so the snake walks across all
+    -- 8 digits — the perimeter loop becomes 28 positions.)
     signal patterns : seg_array_t;
 
 begin
@@ -135,10 +133,7 @@ begin
             seg_n => seg_active
         );
 
-    ----------------------------------------------------------------------------
-    -- TODO Step B: Build the per-digit patterns array.
-    --   Simple version: snake lives only on digit 0.
-    ----------------------------------------------------------------------------
+    -- Digit 0: live snake; digits 1..7: blank.
     patterns(0) <= seg_active;
     gen_blank : for i in 1 to 7 generate
         patterns(i) <= (others => '1');
