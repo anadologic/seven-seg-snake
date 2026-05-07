@@ -1,0 +1,78 @@
+# ----------------------------------------------------------------------------
+# QuestaSim / ModelSim
+# ----------------------------------------------------------------------------
+sim/work/
+**/work/
+transcript
+vsim.wlf
+*.wlf
+*.vstf
+*.mti
+modelsim.ini
+.modelsim*
+
+# ----------------------------------------------------------------------------
+# Vivado
+# ----------------------------------------------------------------------------
+*.jou
+*.log
+*.str
+*.backup.*
+.Xil/
+*.cache/
+*.hw/
+*.ip_user_files/
+*.runs/
+*.sim/
+*.srcs/
+*.gen/
+*.hbs
+*.bit
+*.bin
+*.ltx
+*.dcp
+*.rpt
+*.pb
+*.wdb
+*.wcfg
+vivado_*.backup.*
+vivado_pid*.str
+hd_visual/
+.ipdefs/
+.os_log/
+.docnav/
+xsim.dir/
+webtalk*.log
+webtalk*.jou
+
+# ----------------------------------------------------------------------------
+# Synthesis / P&R intermediate
+# ----------------------------------------------------------------------------
+*.edn
+*.edf
+*.ngc
+*.ngd
+*.ngo
+*.ncd
+*.pcf
+*.par
+*.twr
+*.twx
+*.bld
+*.xpi
+*.xst
+*.lso
+
+# ----------------------------------------------------------------------------
+# Editor / OS
+# ----------------------------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
